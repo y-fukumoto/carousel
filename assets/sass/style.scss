@@ -1,0 +1,36 @@
+@charset "utf-8";
+@import "compass";
+@import "_reset";
+
+#frame {
+	width: 350px;
+	height: 150px;
+	position: relative;
+	overflow: hidden;
+	margin: 10px auto;
+}
+
+#slider {
+	position: absolute;
+	z-index: 0;
+	background-color: #999;
+	width: 1050px;
+	li {
+		float: left;
+		background-color: #333;
+		list-style: none;
+	}
+	img {
+		width: 100%;
+	}
+}
+
+.clearfix {
+	&:after {
+		clear: both;
+		content: "";
+		display: block;
+		height: 0;
+		visibility: hidden;
+	}
+}
