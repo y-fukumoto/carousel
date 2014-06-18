@@ -1,0 +1,65 @@
+html, body, div, span, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+abbr, address, cite, code,
+del, dfn, em, img, ins, kbd, q, samp,
+small, strong, sub, sup, var,
+b, i,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, dialog, figure, footer, header,
+hgroup, menu, nav, section,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  font-size: 100%;
+  vertical-align: baseline;
+  background: transparent;
+}
+
+article, aside, dialog, figure, footer, header,
+hgroup, nav, section {
+  display: block;
+}
+
+a {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  vertical-align: baseline;
+  background: transparent;
+}
+
+#frame {
+  width: 350px;
+  height: 150px;
+  position: relative;
+  overflow: hidden;
+  margin: 10px auto;
+}
+
+#slider {
+  position: absolute;
+  z-index: 0;
+  background-color: #999;
+  width: 1050px;
+}
+#slider li {
+  float: left;
+  background-color: #333;
+  list-style: none;
+}
+#slider img {
+  width: 100%;
+}
+
+.clearfix:after {
+  clear: both;
+  content: "";
+  display: block;
+  height: 0;
+  visibility: hidden;
+}
