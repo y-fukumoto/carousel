@@ -42,13 +42,13 @@ a {
 }
 
 #slider {
-  position: absolute;
+  position: relative;
   z-index: 0;
   background-color: #999;
-  width: 1050px;
 }
 #slider li {
-  float: left;
+  position: absolute;
+  display: block;
   background-color: #333;
   list-style: none;
 }
@@ -62,4 +62,17 @@ a {
   display: block;
   height: 0;
   visibility: hidden;
+}
+
+.fadeWrapper {
+  position: relative;
+  width: 100%;
+  height: 151px;
+  overflow: hidden;
+}
+
+.fadeList {
+  position: absolute;
+  top: 0;
+  left: 0;
 }

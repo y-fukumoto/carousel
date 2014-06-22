@@ -2,6 +2,7 @@
 @import "compass";
 @import "_reset";
 
+// carousel
 #frame {
 	width: 350px;
 	height: 150px;
@@ -11,12 +12,12 @@
 }
 
 #slider {
-	position: absolute;
+	position: relative;
 	z-index: 0;
 	background-color: #999;
-	width: 1050px;
 	li {
-		float: left;
+		position: absolute;
+		display: block;
 		background-color: #333;
 		list-style: none;
 	}
@@ -33,4 +34,18 @@
 		height: 0;
 		visibility: hidden;
 	}
+}
+
+// crossFade
+.fadeWrapper {
+	position: relative;
+	width: 100%;
+	height: 151px;
+	overflow:hidden;
+}
+
+.fadeList {
+	position: absolute;
+	top: 0;
+	left: 0;
 }

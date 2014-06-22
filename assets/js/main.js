@@ -4,174 +4,164 @@
   $(function() {
     var Carousel, carousel;
     Carousel = (function() {
-      var _accelX, _drag, _end, _moving, _slideX, _start;
+      var _current, _imgNum, _moving, _slideX, _slideY, _touchX, _touchY;
 
-      _moving = false;
+      _imgNum = 0;
 
-      _drag = false;
+      _current = 0;
+
+      _touchX = null;
+
+      _touchY = null;
 
       _slideX = null;
 
-      _accelX = null;
+      _slideY = null;
 
-      _start = null;
+      _moving = false;
 
-      _end = null;
-
-      function Carousel(slideEle, speed) {
+      function Carousel(slideEle, thumbnail, speed) {
+        this.slideMove = __bind(this.slideMove, this);
         this.touchEnd = __bind(this.touchEnd, this);
         this.touchMove = __bind(this.touchMove, this);
         this.touchStart = __bind(this.touchStart, this);
-        this.moveNext = __bind(this.moveNext, this);
-        this.movePrev = __bind(this.movePrev, this);
-        this.pagerClick = __bind(this.pagerClick, this);
-        this.$slideWrap = $(slideEle);
-        this.$slide = this.$slideWrap.find('ul');
-        this.$slideList = this.$slide.children('li');
+        this.setSize = __bind(this.setSize, this);
+        this.setLeft = __bind(this.setLeft, this);
+        this.$slideContainer = $(slideEle);
+        this.$slideList = this.$slideContainer.find('li');
         this.listCount = this.$slideList.length;
-        this.imgWidth = this.$slideList.find('img').width();
-        this.decision = this.imgWidth / 2;
-        this.slideLoop = true;
-        this.$prev = $('.prev');
-        this.$next = $('.next');
-        this.$pager = $('.pager').find('a');
+        this.listWidth = this.$slideList.find('img').eq(0).width();
+        this.$pager = $(thumbnail).find('li');
+        this.$btnPrev = $('.prev');
+        this.$btnNext = $('.next');
         this.speed = speed;
-        this.listContainer = this.imgWidth * this.listCount;
-        this.slideLimit = this.listContainer - this.imgWidth;
-        this.setPos();
+        this.setSize(this.$slideContainer);
+        this.setLeft(this.$slideList);
         this.addEvent();
       }
 
-      Carousel.prototype.setPos = function() {
-        this.$slide.css({
-          width: this.listContainer
+      Carousel.prototype.setLeft = function(slideList) {
+        var left;
+        left = this.listWidth;
+        return slideList.each(function() {
+          $(this).css({
+            'margin-left': -left
+          });
+          if (_imgNum === _current) {
+            $(this).css({
+              'margin-left': 0
+            });
+          }
+          return _imgNum++;
         });
-        return this.$slide.css({
-          left: -this.imgWidth
+      };
+
+      Carousel.prototype.setSize = function(slideEle) {
+        var allWidth, maxHeight;
+        allWidth = this.listWidth * this.listCount;
+        maxHeight = 0;
+        slideEle.find('img').each(function() {
+          var height;
+          height = $(this).height();
+          if (maxHeight < height) {
+            return maxHeight = height;
+          }
         });
+        return slideEle.width(allWidth).height(maxHeight);
       };
 
       Carousel.prototype.addEvent = function() {
-        this.$prev.on('click', this.movePrev);
-        this.$next.on('click', this.moveNext);
-        this.$pager.on('click', this.pagerClick);
-        this.$slide.on('touchstart', this.touchStart);
-        this.$slide.on('touchmove', this.touchMove);
-        this.$slide.on('touchend', this.touchEnd);
-        return this.$slide.on('touchleave', this.touchLeave);
-      };
-
-      Carousel.prototype.pagerClick = function(e) {
-        var index, target;
-        target = $(e.target);
-        index = this.$pager.index(target);
-        return this.$slide.animate({
-          left: -(this.imgWidth * index)
-        }, this.speed);
-      };
-
-      Carousel.prototype.movePrev = function() {
-        var offset,
-          _this = this;
-        if (!_moving) {
-          _moving = true;
-          offset = this.$slide.position().left;
-          return this.$slide.animate({
-            left: offset + this.imgWidth
-          }, this.slideSpeed, function() {
-            _moving = false;
-            _this.$slide.css({
-              left: -_this.imgWidth
-            });
-            return _this.$slide.find('li:last').prependTo(_this.$slide);
-          });
-        }
-      };
-
-      Carousel.prototype.moveNext = function() {
-        var offset,
-          _this = this;
-        if (!_moving) {
-          _moving = true;
-          offset = this.$slide.position().left;
-          return this.$slide.animate({
-            left: offset - this.imgWidth
-          }, this.slideSpeed, function() {
-            _moving = false;
-            _this.$slide.css({
-              left: -_this.imgWidth
-            });
-            return _this.$slide.find('li:first').appendTo(_this.$slide);
-          });
-        }
+        var _this = this;
+        this.$btnPrev.on('click', function() {
+          return _this.slideMove(_current - 1);
+        });
+        this.$btnNext.on('click', function() {
+          return _this.slideMove(_current + 1);
+        });
+        this.$pager.on('click', function(e) {
+          var $target, num;
+          e.preventDefault();
+          $target = $(e.currentTarget);
+          num = _this.$pager.index($target);
+          if (num !== _current) {
+            return _this.slideMove(num);
+          }
+        });
+        this.$slideList.on('touchstart', this.touchStart);
+        this.$slideList.on('touchmove', this.touchMove);
+        return this.$slideList.on('touchend', this.touchEnd);
       };
 
       Carousel.prototype.touchStart = function(e) {
-        _drag = true;
-        _start = e.originalEvent.touches[0].pageX;
-        return _slideX = this.$slide.position().left;
+        _touchX = e.originalEvent.changedTouches[0].pageX;
+        _slideX = this.$slideContainer.position().left;
+        _touchY = e.originalEvent.changedTouches[0].pageY;
+        return _slideY = this.$slideContainer.position().top;
       };
 
       Carousel.prototype.touchMove = function(e) {
-        _slideX = _slideX - (_start - e.originalEvent.touches[0].pageX);
-        _accelX = (e.originalEvent.touches[0].pageX - _start) * 5;
-        _start = e.originalEvent.touches[0].pageX;
-        return this.$slide.css({
-          left: _slideX
-        });
+        var slideMathX, slideMathY;
+        _slideX = _slideX - (_touchX - e.originalEvent.changedTouches[0].pageX);
+        _touchX = e.originalEvent.changedTouches[0].pageX;
+        _slideY = _slideY - (_touchY - e.originalEvent.changedTouches[0].pageY);
+        _touchY = e.originalEvent.changedTouches[0].pageY;
+        slideMathX = Math.abs(_slideX);
+        slideMathY = Math.abs(_slideY);
+        if (slideMathX < slideMathY) {
+          return this;
+        }
+        switch (true) {
+          case _touchX - 40 > (_touchX + _slideX):
+            console.log("_touchX" + _touchX);
+            console.log(_touchX + _slideX);
+            e.preventDefault();
+            if (_moving === true) {
+              this.slideMove(_current + 1);
+              return _moving = false;
+            }
+            break;
+          case _touchX + 40 < (_touchX + _slideX):
+            console.log(_touchX + _slideX);
+            e.preventDefault();
+            if (_moving === true) {
+              this.slideMove(_current - 1);
+              return _moving = false;
+            }
+        }
       };
 
       Carousel.prototype.touchEnd = function(e) {
-        var edge;
-        if (_accelX > 20) {
-          _accelX = this.decision;
-        }
-        if (_accelX < -20) {
-          _accelX = -this.decision;
-        }
-        _slideX += _accelX;
-        _accelX = 0;
-        if (_slideX > 0) {
-          _slideX = 0;
-          if (this.slideLoop === true) {
-            return this.$slide.animate({
-              left: -((this.imgWidth * this.listCount) - this.imgWidth)
-            }, this.speed);
-          }
-        } else if (_slideX < -this.slideLimit - 100) {
-          if (this.slideLoop === true) {
-            return this.$slide.animate({
-              left: 0
-            }, this.speed);
-          } else {
-            _slideX = -this.slideLimit;
-            return this.$slide.animate({
-              left: _slideX
-            }, this.speed);
-          }
+        return _moving = true;
+      };
+
+      Carousel.prototype.slideMove = function(goTo) {
+        var left, pos;
+        left = null;
+        if (_current < goTo) {
+          pos = this.listWidth;
         } else {
-          edge = _slideX % this.imgWidth;
-          if (edge > -(this.imgWidth / 3)) {
-            _slideX -= edge;
-            return this.$slide.animate({
-              left: _slideX
-            }, this.speed);
-          } else {
-            console.log("_slideX" + _slideX);
-            console.log("edge" + edge);
-            _slideX = _slideX - edge - this.imgWidth;
-            console.log(_slideX);
-            return this.$slide.animate({
-              left: _slideX
-            }, 100);
-          }
+          pos = -this.listWidth;
         }
+        if (goTo === _imgNum) {
+          goTo = 0;
+        } else if (goTo === -1) {
+          goTo = _imgNum - 1;
+        }
+        this.$slideList.eq(goTo).css({
+          'margin-left': pos
+        }).stop(true, true).animate({
+          'margin-left': 0
+        }, this.speed);
+        this.$slideList.eq(_current).stop(true, true).animate({
+          'margin-left': -pos
+        }, this.speed);
+        return _current = goTo;
       };
 
       return Carousel;
 
     })();
-    return carousel = new Carousel('#frame', 400);
+    return carousel = new Carousel('#slider', '.pager', 400);
   });
 
 }).call(this);

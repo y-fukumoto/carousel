@@ -1,0 +1,10 @@
+{
+  "version": 3,
+  "file": "crossFead.js",
+  "sourceRoot": "../coffee/",
+  "sources": [
+    "crossFead.coffee"
+  ],
+  "names": [],
+  "mappings": "AAAA;CAAA;CAAA"
+}
